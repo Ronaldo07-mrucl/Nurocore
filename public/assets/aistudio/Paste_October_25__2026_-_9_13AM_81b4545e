@@ -1,0 +1,927 @@
+# NEUROCORE — PHASE 9: AI PERSONAL MENTOR
+
+## PROJECT OBJECTIVE
+
+Build Phase 9: AI Personal Mentor for the existing NEUROCORE application.
+
+NEUROCORE already has eight planned phases:
+
+1. Foundation & Dashboard
+2. Study Log
+3. Test & Error Log
+4. Fitness
+5. Habit Tracking
+6. Planning & Weekly Scheduler
+7. Analytics
+8. Reflection & Diary
+
+This phase introduces an AI-powered personal mentor that helps the user understand daily experiences, recognize patterns, learn from setbacks, make realistic plans, and reflect on progress across different areas of life.
+
+The mentor must integrate with existing application data without creating duplicate tracking systems.
+
+The experience should feel like a thoughtful, supportive, honest mentor who can also hold a natural conversation—not a generic chatbot, an aggressive productivity coach, or a system that judges the user by numbers.
+
+### Core capabilities
+
+- Daily AI debrief
+- Weekly reflection and progress review
+- Monthly progress and pattern analysis
+- Conversational personal mentor
+- Study, exam preparation, and mistake analysis
+- Fitness and routine reflection
+- Habit consistency and goal progress analysis
+- Personalized, realistic next-step recommendations
+- Explicit consent before sharing private journal entries with an external AI provider
+- Local summaries and analytics that remain available without AI
+
+**Implement only Phase 9. Do not rebuild Phases 1–8 or introduce unrelated modules.**
+
+---
+
+# 1. INSPECT THE EXISTING PROJECT FIRST
+
+Before coding, inspect the complete relevant application architecture.
+
+Identify:
+
+- React, TypeScript, Vite, Tailwind, Lucide React, and Recharts versions already in use.
+- Existing routes and navigation structure.
+- Shared TypeScript interfaces and domain models.
+- Existing localStorage utilities and storage keys.
+- Dashboard, Study Log, Test & Error Log, Fitness, Habit Tracking, Planning, Analytics, and Reflection implementations.
+- Existing date utilities, metrics, charts, and period filters.
+- Existing task completion, habit scheduling, streak, test scoring, workout, and journal data conventions.
+- Any existing backend, serverless functions, environment-variable configuration, or AI provider integration.
+- Available free-tier development and deployment constraints, if they are already documented in the project.
+
+Do not assume the data schemas. Read the actual source code and adapt to it.
+
+### Preservation requirements
+
+- Preserve all existing routes and modules.
+- Preserve existing localStorage keys and records.
+- Reuse the current storage and state-management architecture.
+- Do not duplicate study sessions, tests, habits, workouts, tasks, goals, or journal entries.
+- Do not replace existing working features with mock implementations.
+- Do not run destructive migrations.
+- Avoid unnecessary dependencies.
+- Do not introduce a paid service as a mandatory requirement.
+- Do not begin implementation until the existing architecture is understood.
+
+If an existing feature already satisfies part of this specification, extend it rather than building a competing version.
+
+---
+
+# 2. DESIGN SYSTEM AND NAVIGATION
+
+Continue the established NEUROCORE design system:
+
+- Background: `#0B0B10`
+- Panels: `#14141D`
+- Borders: `#292936`
+- Purple accent: `#9B7BFF`
+- Green accent: `#43D9A3`
+- Primary text: near-white
+- Secondary text: muted gray
+- Existing Lucide React icons
+- Existing typography, spacing, card patterns, and responsive behavior
+
+Retain the right-side navigation rail.
+
+Add a new navigation item:
+
+**AI Mentor**
+
+Use an appropriate Lucide icon, such as `brain`, if it matches the existing icon library.
+
+Highlight the active navigation item using the established style.
+
+### Mentor page layout
+
+Build a responsive, polished page with these main sections:
+
+1. Mentor greeting and overview
+2. Daily debrief
+3. Weekly and monthly reviews
+4. Conversational mentor
+5. Suggested actions and follow-up questions
+6. AI settings, privacy controls, and provider status
+
+On desktop, use the available width intelligently. On mobile, stack sections vertically and make conversation comfortable to use.
+
+Do not crowd the page with every section expanded simultaneously. Use tabs, collapsible sections, or cards consistent with the existing application.
+
+---
+
+# 3. AI PROVIDER ARCHITECTURE — CRITICAL
+
+The application currently prioritizes a free-tier, local-first stack. Implement the AI integration in a way that is functional, replaceable, and honest about its requirements.
+
+## A. Provider abstraction
+
+Create a typed provider interface that separates the mentor UI from the AI vendor.
+
+Conceptually, the interface should support:
+
+- Generating a response from a structured request
+- Summarizing a daily context
+- Summarizing a weekly context
+- Summarizing a monthly context
+- Reporting loading, configuration, and provider errors
+- Supporting cancellation or safe abandonment of an in-progress request where practical
+
+Adapt method names to the existing architecture.
+
+The UI must not be tightly coupled to one AI vendor's response format.
+
+## B. Free-tier strategy
+
+First, determine whether the existing project already has a working backend or a securely configured AI endpoint.
+
+Use the following decision order:
+
+1. Reuse an existing secure AI endpoint if one is already configured.
+2. If a provider adapter or backend integration exists, extend it.
+3. If no secure AI connection exists, implement the provider abstraction, settings UI, request validation, local analytics, and a clear not-configured state.
+4. Document the exact steps required to connect a real provider through an appropriate secure endpoint.
+
+Do not require a paid API or subscription for the application to launch.
+
+Do not assume that an AI provider's free tier is permanent, unlimited, or available in every region. Treat provider quotas, model access, and pricing as configurable external constraints.
+
+### Important security rule
+
+Never embed a secret API key in client-side React code, Vite environment variables exposed to the browser, committed source files, or downloadable application bundles.
+
+A `VITE_` environment variable is not a secure place for a secret key.
+
+Never store a secret provider key in localStorage or expose it in application logs.
+
+If the existing app has no backend, do not invent a secure backend that does not exist. Provide the adapter and integration boundary, and clearly indicate that live AI requires a securely configured endpoint.
+
+If a free-tier serverless deployment is suitable, describe it as an optional deployment path rather than a guaranteed free service.
+
+### No fake AI
+
+- Do not hardcode AI responses and present them as generated.
+- Do not return predetermined summaries while claiming a live provider was used.
+- Do not silently fall back to fake responses when the provider fails.
+- Local analytics and deterministic summaries may work without AI, but label them clearly as local calculations rather than AI-generated interpretations.
+
+---
+
+# 4. PRIVACY AND EXPLICIT JOURNAL CONSENT
+
+This is a mandatory requirement.
+
+Journal entries may contain sensitive personal thoughts. The mentor must never send their contents to an external provider without the user's explicit, informed permission.
+
+## A. Data-sharing settings
+
+Add an AI privacy settings section with:
+
+- External AI status: connected or not configured
+- A clear explanation of what information may leave the device
+- An explicit journal-sharing consent control
+- A way to revoke consent
+- A way to review the context selected for a request
+- A way to exclude specific entries from AI analysis
+- A way to clear locally saved AI conversation history
+- A way to delete generated summaries
+
+Do not preselect journal-sharing consent.
+
+Do not treat clicking a general "Enable AI" control as consent to share private journal entries.
+
+Do not use a consent control that silently opts in again after revocation.
+
+## B. Consent workflow
+
+Whenever a requested AI action would transmit journal content:
+
+1. Identify the relevant journal entries.
+2. Explain which entries or date range will be included.
+3. Explain which categories of data will be sent.
+4. Show a preview of the proposed context, with private text visible only within the user's session.
+5. Ask the user to confirm sharing for that request, unless the user has separately enabled an equally explicit and clearly scoped consent option.
+6. Send only the approved content.
+7. Display a clear indication that the request is being sent to an external provider.
+8. Report success or failure honestly.
+
+For the initial implementation, prefer **per-request confirmation** for private journal text. If you add remembered consent, it must be separate, optional, specific to the relevant data categories, and easily revocable.
+
+Consent must be checked immediately before the external request, not just when the page loads.
+
+If consent is absent or revoked, omit journal content entirely.
+
+### Example confirmation message
+
+"Your weekly review can include reflections saved between Monday and Sunday. These entries may contain personal information. If you continue, the selected text and approved summary context will be sent to the configured AI provider. You can review or exclude entries before continuing."
+
+Buttons:
+- Review entries
+- Exclude journal entries
+- Share selected entries and continue
+- Cancel
+
+The wording must accurately reflect the actual data being transmitted.
+
+## C. Data minimization
+
+Send only the context necessary for the requested analysis.
+
+For example:
+
+- A study-performance question may need study sessions, subject labels, test results, and relevant error categories—but not journal text.
+- A fitness question may need workout records and weight trends—but not private reflections.
+- A weekly personal reflection may need selected journal entries and relevant habit or planning summaries.
+
+Do not send the entire localStorage database to the provider.
+
+Do not automatically include every previous journal entry in each request.
+
+Do not include secrets, authentication tokens, unrelated personal records, or hidden application state.
+
+## D. Revocation and deletion
+
+When journal-sharing consent is revoked:
+
+- Future AI requests must exclude journal text.
+- The interface must update immediately.
+- Previously generated summaries must not be represented as deleted automatically.
+- Offer deletion of locally stored AI summaries and conversation history.
+- Explain that information already sent to an external provider may be subject to that provider's retention policy.
+
+Do not claim that revocation can recall previously transmitted information.
+
+## E. Local-first behavior
+
+The app must remain usable if the user never enables AI or never consents to sharing journal entries.
+
+All existing module tracking and calculations should continue to work locally.
+
+---
+
+# 5. MENTOR CONTEXT ENGINE
+
+Build a context-preparation layer that converts existing app records into a compact, typed, validated context object.
+
+The context engine must read existing shared records without modifying them.
+
+Use the actual project data models.
+
+### Potential context categories
+
+**Study**
+- Study duration by date
+- Questions solved
+- Subject-level activity
+- Chapter mastery states
+- Revision activity, if recorded
+- Recent test scores and maximum marks
+- Existing error categories and resolution state
+
+**Fitness**
+- Workout frequency
+- Recorded workout types
+- Body-weight trend, if available
+- Other measurements only when relevant to the question
+
+**Habits**
+- Scheduled occurrences
+- Completed occurrences
+- Consistency percentages
+- Existing streak information, if available
+
+**Planning**
+- Planned tasks
+- Completed tasks
+- Overdue incomplete tasks
+- Monthly outcomes
+- Long-term goals and progress
+
+**Reflection**
+- User-approved journal entries
+- Mood and energy labels if recorded
+- Weekly reviews
+- Tags and selected highlights
+
+### Context preparation rules
+
+- Respect the selected date range.
+- Use the existing local-date handling.
+- Avoid timezone shifts for date-only values.
+- Distinguish missing data from zero.
+- Do not infer unrecorded events.
+- Do not mutate the underlying records.
+- Do not count the same event twice.
+- Use actual recorded dates and values.
+- Handle deleted subjects, missing optional fields, and malformed records gracefully.
+- Exclude private journal content by default.
+
+### Context preview
+
+Before an external request, show a compact summary of the selected context, for example:
+
+- Date range: last 7 days
+- Study sessions: 12
+- Tests included: 2
+- Habit records included: 5 habits
+- Fitness records included: 3 workouts
+- Journal entries: 0 included
+
+The counts must be computed from the real records selected for the request.
+
+When journal content is excluded, show that explicitly.
+
+Do not expose the full contents of private entries in a general analytics panel.
+
+---
+
+# 6. DAILY DEBRIEF
+
+Create a Daily Debrief feature on the AI Mentor page.
+
+Allow the user to choose a date, defaulting to today.
+
+The system should prepare relevant recorded activity from the existing modules.
+
+### Recommended response structure
+
+1. **Today's snapshot**
+   - Concise factual summary of available recorded activity.
+
+2. **What went well**
+   - Identify evidence-supported progress or positive moments.
+   - Do not invent accomplishments.
+
+3. **What deserves attention**
+   - Highlight a possible obstacle or gap between plan and recorded activity.
+   - Use neutral wording.
+
+4. **A useful lesson**
+   - Offer an interpretation only when the data supports it.
+   - Distinguish an observed fact from a possible explanation.
+
+5. **Tomorrow's next steps**
+   - Suggest one to three practical, manageable actions.
+   - Use existing tasks and goals where appropriate.
+   - Do not automatically create tasks.
+
+6. **One reflection question**
+   - Offer a question the user may answer in the Reflection module.
+
+### Daily debrief rules
+
+- If no data exists for a category, acknowledge that it was not recorded.
+- Do not interpret missing records as proof that the user did nothing.
+- If the user has not written a journal entry, do not invent a reflection.
+- If the user requests a personal reflection but has not consented to sharing journal content, generate a debrief from approved non-journal context or ask whether they want to select an entry.
+- Clearly label AI interpretations as interpretations, not facts.
+
+Provide actions to:
+- Generate debrief
+- Regenerate
+- Copy response
+- Save summary
+- Open the relevant source module
+
+Save summaries only when requested or when the user has explicitly enabled a clearly explained save preference.
+
+---
+
+# 7. WEEKLY REVIEW
+
+Implement a Weekly Mentor Review.
+
+Reuse the existing week-navigation and date utilities from Planning and Analytics.
+
+Allow:
+- Previous week
+- Next week
+- Current week
+- Selecting a specific week
+
+### Weekly report structure
+
+**1. Week at a glance**
+- Study hours
+- Questions solved
+- Tests taken and average valid percentage
+- Habit consistency
+- Workouts recorded
+- Tasks due and completed
+- Reflection entry count, if journal sharing is approved
+
+**2. Wins**
+- Identify evidence-supported progress.
+
+**3. Patterns**
+- Highlight repeated events or trends that can actually be supported by the selected records.
+
+**4. Friction points**
+- Identify possible obstacles without assigning blame or claiming to know their cause.
+
+**5. Goal alignment**
+- Compare activity with existing goals and plans where a valid comparison is possible.
+
+**6. Recommendations**
+- Suggest up to three realistic priorities for the coming week.
+
+**7. Reflection question**
+- Ask one useful question that encourages independent thought.
+
+### Comparison rules
+
+- Compare against the preceding week only when sufficient records are available.
+- Distinguish no activity from missing data.
+- Avoid interpreting correlation as causation.
+- Do not claim that a specific habit caused a change in study performance unless the evidence genuinely supports that conclusion.
+- Do not overstate patterns based on one or two observations.
+- Use phrases such as "One possible pattern" or "This may be worth exploring" when appropriate.
+
+### Journal handling
+
+If the report includes journal content, apply the consent workflow before sending the request.
+
+If journal content is not approved, generate the report from non-journal data and clearly indicate that personal reflections were not included.
+
+---
+
+# 8. MONTHLY REVIEW
+
+Implement a Monthly Mentor Review using existing Analytics calculations wherever possible.
+
+Allow navigation between months and selection of a specific month.
+
+### Report sections
+
+**A. Overall progress**
+- Study hours and questions solved
+- Test performance
+- Habit consistency
+- Workouts and recorded fitness trends
+- Task completion
+- Long-term goal progress
+
+**B. Improvements**
+- Compare valid metrics with the preceding month.
+
+**C. Areas needing attention**
+- Identify sustained gaps or recurring challenges supported by records.
+
+**D. Patterns over time**
+- Use multiple observations rather than one isolated day.
+- Mention when the available history is too limited to draw a meaningful conclusion.
+
+**E. Next month's focus**
+- Suggest a small number of priorities.
+- Avoid creating unrealistic schedules or too many simultaneous goals.
+
+**F. Reflection**
+- Summarize approved journal entries only when the user explicitly approves the relevant data sharing.
+
+### Accuracy requirements
+
+- Do not mix incompatible raw test scores.
+- Normalize test scores to percentages when appropriate.
+- Treat the current month as incomplete when relevant.
+- Distinguish a goal's recorded progress from an actual completed outcome.
+- Do not assume changes in body weight are automatically positive or negative.
+- Do not frame productivity as a measure of personal worth.
+
+Monthly reports must remain useful even if only study or planning data exists.
+
+---
+
+# 9. CONVERSATIONAL PERSONAL MENTOR
+
+Create a chat interface where the user can ask questions about progress, routines, goals, challenges, and reflections.
+
+The conversation should support natural language rather than requiring fixed templates.
+
+### Example questions
+
+- "What patterns do you notice in my study routine?"
+- "Help me understand why I keep postponing difficult topics."
+- "How has my consistency changed this month?"
+- "Help me make a realistic plan for next week."
+- "What should I prioritize before my next exam?"
+- "How can I make my routine easier to maintain?"
+- "Can you help me reflect on a difficult day?"
+- "Which of my current goals needs attention first?"
+
+### Chat interaction
+
+Include:
+- Message history
+- User message input
+- Send button
+- Loading indicator
+- Clear error states
+- Retry action
+- Stop or cancel action where practical
+- Copy response
+- Clear conversation history
+- Suggested starter questions
+- Optional date-range selection for data-related questions
+
+Support keyboard submission and accessible controls.
+
+Do not send an empty message.
+
+Prevent duplicate submissions when a request is in progress.
+
+If a request fails, preserve the user's draft message.
+
+### Conversation context
+
+Use the current conversation plus a compact, relevant context object.
+
+Do not send the entire database or every previous conversation message with every request.
+
+Use a configurable conversation history limit.
+
+When older messages are omitted, do not pretend the AI still has their full contents.
+
+If the user asks about a previous AI-generated report, include that report only if it is available locally and appropriate to share under the active consent rules.
+
+### Mentor persona
+
+The mentor should be:
+
+- Warm and respectful
+- Honest about uncertainty
+- Curious rather than judgmental
+- Encouraging without exaggerated praise
+- Practical rather than preachy
+- Willing to question an assumption gently
+- Focused on helping the user think clearly and make their own decisions
+
+It should not automatically agree with every user assumption.
+
+It should not shame the user for missed tasks, incomplete habits, low study hours, or changing goals.
+
+It should not pretend to be human or claim to have personal feelings.
+
+It should not encourage emotional dependence on the AI. Encourage independent judgment and meaningful support from trusted people when appropriate.
+
+Do not present the AI as a substitute for a qualified professional.
+
+---
+
+# 10. MENTOR BEHAVIOR AND RESPONSE QUALITY
+
+Create a consistent system instruction for the mentor, stored in the provider integration layer rather than duplicated across page components.
+
+The system instruction should enforce these rules:
+
+1. Use only supplied context and general knowledge.
+2. Never invent user history, events, records, or personal preferences.
+3. Distinguish recorded facts from interpretation and recommendation.
+4. Admit when context is incomplete.
+5. Ask clarifying questions when a reliable recommendation depends on missing information.
+6. Prefer practical, small next steps over overwhelming plans.
+7. Respect the user's stated goals and constraints.
+8. Avoid medical diagnoses, psychological diagnoses, or unsupported health conclusions.
+9. Avoid rigid or unsafe advice about dieting, exercise, sleep, or productivity.
+10. Treat weight and fitness records neutrally and focus on sustainable well-being.
+11. Never frame a missed task or low-activity day as a personal failure.
+12. Avoid false certainty about why the user behaves a certain way.
+13. Avoid overly long responses when a concise answer is sufficient.
+14. Use a supportive, conversational tone without excessive flattery.
+15. Protect journal privacy and follow the approved context exactly.
+16. Never claim to have created a task, updated a goal, or modified a record unless the application actually performed that action.
+
+### Suggested response format for analytical questions
+
+When useful, structure responses as:
+
+- **What the records show**
+- **What might be happening**
+- **What is uncertain**
+- **A practical next step**
+
+Do not force this format onto every casual conversation.
+
+### Sensitive conversations
+
+If the user discusses distress or a serious personal difficulty:
+
+- Respond empathetically and without judgment.
+- Do not diagnose the user.
+- Do not trivialize the problem.
+- Encourage reaching out to a trusted person or qualified support when appropriate.
+- Do not imply that the AI can replace human relationships or professional help.
+
+---
+
+# 11. RECOMMENDATIONS AND ACTIONS
+
+Allow the mentor to recommend actions based on the user's existing goals and context.
+
+Examples:
+- Schedule a revision session for a chapter already marked for revision.
+- Review unresolved test errors.
+- Break an existing goal into a smaller next step.
+- Review a habit that has become inconsistent.
+- Reflect on a repeated obstacle.
+- Choose a realistic priority for the following day.
+
+### Strict action rules
+
+For the initial Phase 9 implementation, the mentor is advisory only.
+
+- It may suggest actions.
+- It may link to the relevant app page.
+- It may offer a copyable plan.
+- It must not silently create, edit, complete, or delete tasks.
+- It must not modify habits, goals, workouts, study sessions, tests, or journal entries on the user's behalf.
+- It must not automatically change the user's schedule.
+
+If an action is supported by the existing UI, the user may navigate to the appropriate page and perform it themselves.
+
+Do not add autonomous agents or background actions in this phase.
+
+---
+
+# 12. SAVED SUMMARIES AND MEMORY
+
+The mentor should be able to retain useful review history locally without sending all historical data to the provider.
+
+### Saved report types
+
+Support locally saved:
+- Daily debriefs
+- Weekly reviews
+- Monthly reviews
+
+Each saved report should include:
+- Stable ID
+- Report type
+- Date range
+- Generated timestamp
+- Relevant metric snapshot, when useful
+- AI-generated report text
+- Context categories used
+- Whether journal text was included
+
+Do not include full private journal content in the report metadata.
+
+### Persistence rules
+
+- Store saved reports in the existing local-first architecture.
+- Reuse existing storage utilities.
+- Do not overwrite a previous report without confirmation.
+- Allow the user to view, rename if appropriate, and delete saved reports.
+- Make the source date range clear.
+- Mark reports as historical snapshots so they are not mistaken for current live metrics.
+
+### Long-term pattern detection
+
+Use saved reports and available history to help identify longer-term patterns.
+
+However:
+- Do not claim persistent AI memory unless the application actually implements it.
+- Do not automatically send all saved reports with each request.
+- Allow the user to select which historical reports are included.
+- Prefer compact factual summaries over entire conversations.
+- Clearly distinguish historical observations from current records.
+- Let the user delete locally stored AI reports and conversation history.
+
+Do not create a second source of truth for study, fitness, habit, or planning data.
+
+---
+
+# 13. DASHBOARD INTEGRATION
+
+Extend the existing Dashboard without redesigning it.
+
+Add a compact AI Mentor card containing:
+- A short welcome or mentor status
+- Last saved debrief date, if available
+- A `Daily Debrief` action
+- A `Talk to Mentor` action
+
+If no provider is configured, show a clear message that live AI is not connected. Local analytics should still be accessible.
+
+Do not display fabricated AI greetings that imply the provider analyzed the user's day when no analysis occurred.
+
+Avoid exposing private journal text on the Dashboard.
+
+Do not add another full analytics dashboard.
+
+---
+
+# 14. SETTINGS AND ERROR HANDLING
+
+Create or extend a settings area for the mentor.
+
+Include:
+- Provider connection status
+- Model or provider selection only where genuinely supported
+- Endpoint configuration if the existing architecture supports it
+- Journal-sharing consent
+- Context inclusion controls
+- Saved report preferences
+- Conversation history controls
+- Clear status messages
+
+### Error states
+
+Handle:
+- Provider not configured
+- Invalid provider response
+- Network failure
+- Rate limit reached
+- Request timeout
+- Authentication failure
+- Context validation failure
+- Consent missing or revoked
+- Empty response
+- User cancellation
+
+Display clear, actionable messages.
+
+Do not display raw secrets, authorization headers, stack traces, or private journal contents in the UI or logs.
+
+If AI is unavailable, offer local metrics, existing analytics, and a manual reflection workflow instead.
+
+Do not silently retry expensive requests indefinitely.
+
+---
+
+# 15. TYPES, UTILITIES, AND CODE ORGANIZATION
+
+Use the existing TypeScript architecture and adapt names to the actual codebase.
+
+Create or extend well-separated modules for:
+
+- AI provider abstraction
+- Provider request and response types
+- Mentor context builder
+- Privacy and consent checks
+- Daily debrief generation
+- Weekly review generation
+- Monthly review generation
+- Conversation state
+- Saved report storage
+- Prompt and response validation
+- Error normalization
+
+Keep UI components separate from provider calls and context calculations.
+
+Use pure functions for deterministic calculations.
+
+Use existing date and analytics utilities wherever possible.
+
+Avoid:
+- Giant components containing all mentor functionality
+- Duplicated calculations
+- Hardcoded sample metrics
+- Unsafe type casts
+- Secret keys in client code
+- Unnecessary libraries
+- Hidden background network requests
+
+Add tests if the project already has a suitable test framework.
+
+---
+
+# 16. SECURITY AND DATA VALIDATION
+
+Before sending a request:
+
+1. Validate the requested report type.
+2. Validate the selected date range.
+3. Build the approved context from existing records.
+4. Remove fields not required for the requested task.
+5. Apply consent rules.
+6. Validate the final payload.
+7. Send the request only through the configured provider integration.
+8. Validate the response before displaying or saving it.
+
+Treat AI output as untrusted text.
+
+Render it safely. Do not interpret model output as executable HTML or JavaScript.
+
+Do not let instructions contained in a journal entry or other user data override the mentor's system instructions, change privacy settings, or authorize additional data transmission.
+
+If a server-side endpoint is implemented, validate requests and enforce provider access controls on the server.
+
+Do not assume that a prompt alone provides security.
+
+---
+
+# 17. PERFORMANCE AND USER EXPERIENCE
+
+- Keep local analytics responsive.
+- Avoid blocking the entire application while a report is generated.
+- Use appropriate loading states.
+- Prevent duplicate requests.
+- Cancel obsolete requests when practical.
+- Preserve conversation drafts after errors.
+- Avoid unnecessary re-renders.
+- Memoize derived data when useful.
+- Do not send requests automatically on every keystroke.
+- Do not regenerate reports on every page render.
+- Require an explicit user action to start an AI analysis.
+- Keep all existing app modules usable while a request is running.
+
+AI features should never be required to access existing data or use the core application.
+
+---
+
+# 18. IMPLEMENTATION ORDER
+
+Build Phase 9 in this sequence.
+
+### Step 1: Architecture and provider adapter
+Inspect existing code, define types, and establish the provider integration boundary.
+
+### Step 2: Privacy and context controls
+Build context selection, journal exclusion, consent confirmation, and request validation before enabling journal-aware requests.
+
+### Step 3: Daily debrief
+Implement the first complete report flow using real app records.
+
+### Step 4: Weekly and monthly reviews
+Reuse the same context engine and report-generation infrastructure.
+
+### Step 5: Conversational mentor
+Implement chat, relevant context selection, loading states, errors, and history controls.
+
+### Step 6: Saved reports
+Add local persistence and management for generated reports.
+
+### Step 7: Dashboard integration and settings
+Connect the feature to the existing navigation and Dashboard.
+
+### Step 8: Regression and privacy testing
+Verify all eight earlier phases and test consent enforcement before declaring the work complete.
+
+Do not skip privacy and provider architecture to build a visually impressive but nonfunctional chat screen.
+
+---
+
+# 19. ACCEPTANCE TESTS
+
+Phase 9 is complete only when the following have been checked.
+
+## AI connection
+- [ ] Provider abstraction exists and is typed.
+- [ ] The app clearly distinguishes configured AI from unavailable AI.
+- [ ] No secret key is exposed in client-side code or committed files.
+- [ ] No fake AI responses are presented as live generation.
+- [ ] Provider errors are handled gracefully.
+
+## Daily, weekly, and monthly reports
+- [ ] Reports use actual records from existing modules.
+- [ ] Date ranges are correct and inclusive where intended.
+- [ ] Test scores with different maximum marks are compared appropriately.
+- [ ] Habit consistency respects scheduled occurrences.
+- [ ] Missing data is not presented as zero activity.
+- [ ] Recommendations do not automatically modify app records.
+- [ ] Reports can be saved locally and revisited.
+
+## Conversational mentor
+- [ ] The user can send and receive messages when a provider is configured.
+- [ ] The user can cancel or retry where supported.
+- [ ] Failed requests preserve the message draft.
+- [ ] Context is relevant and limited.
+- [ ] The mentor does not fabricate user history or claim unsupported insights.
+
+## Privacy
+- [ ] Journal content is excluded by default.
+- [ ] Journal-aware requests require explicit approval.
+- [ ] The user can review the selected journal context.
+- [ ] Excluded entries are never included in the outgoing payload.
+- [ ] Revoking consent prevents future journal sharing.
+- [ ] AI requests do not send the entire localStorage database.
+- [ ] Private journal text is not logged to the console.
+- [ ] Saved summaries can be deleted.
+- [ ] The app remains usable without AI or journal-sharing consent.
+
+## Regression
+- [ ] Dashboard works.
+- [ ] Study Log and chapter mastery work.
+- [ ] Test & Error Log works.
+- [ ] Fitness and measurements work.
+- [ ] Habit schedules and completion history work.
+- [ ] Planning, goals, and tasks work.
+- [ ] Analytics remains accurate.
+- [ ] Reflection and Diary remain intact.
+- [ ] Existing records survive refreshes and updates.
+
+## Final report
+When implementation is complete, provide:
+- Features implemented
+- Files added or modified
+- Provider integration status
+- Whether real AI requests work in the current environment
+- How to configure the provider securely
+- How journal consent is enforced
+- Tests performed
+- Remaining limitations or bugs
+
+**STOP AFTER PHASE 9. Do not add unrequested features or rebuild previous phases.**
