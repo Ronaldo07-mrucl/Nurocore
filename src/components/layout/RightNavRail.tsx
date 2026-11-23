@@ -58,7 +58,7 @@ export const RightNavRail: React.FC = () => {
 
         {/* Full horizontal logo for desktop rail */}
         <img
-          src="/assets/aistudio/Neurocore_Futuristic_Brain_Logo_cf4bb19f.png"
+          src="public/assets/aistudio/Neurocore_Futuristic_Brain_Logo_cf4bb19f.png"
           alt="NEUROCORE"
           className="hidden md:block w-full h-16 object-contain scale-[1.22] mix-blend-screen"
         />
