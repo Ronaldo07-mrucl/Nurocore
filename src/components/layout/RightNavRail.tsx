@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { NavigationDestination } from '../../types';
+import neurocoreLogo from '../../assets/images/Neurocore_Logo.png';
 import { BottomStudyTargetPanel } from './BottomStudyTargetPanel';
 import {
   LayoutDashboard,
@@ -50,7 +51,7 @@ export const RightNavRail: React.FC = () => {
         {/* Compact brain icon for collapsed mobile rail */}
         <div className="md:hidden w-12 h-12 overflow-hidden relative shrink-0">
           <img
-            src="/assets/aistudio/Neurocore_Futuristic_Brain_Logo_cf4bb19f.png"
+            src={neurocoreLogo}
             alt="NEUROCORE"
             className="h-[68px] max-w-none absolute left-[-13px] top-1/2 -translate-y-1/2 mix-blend-screen"
           />
@@ -58,7 +59,7 @@ export const RightNavRail: React.FC = () => {
 
         {/* Full horizontal logo for desktop rail */}
         <img
-          src="Nurocore/src/assets/images/Neurocore_Logo.png"
+          src={neurocoreLogo}
           alt="NEUROCORE"
           className="hidden md:block w-full h-16 object-contain scale-[1.22] mix-blend-screen"
         />
