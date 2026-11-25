@@ -47,10 +47,10 @@ export const TasksAndPlansSection: React.FC = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
       {/* LEFT CARD — Today's Tasks */}
-      <div className="bg-[#14141D] border border-[#292936] rounded-xl p-5 flex flex-col justify-between">
-        <div>
-          {/* Header */}
-          <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-[#292936]">
+      <div className="bg-[#14141D] border border-[#292936] rounded-xl p-5 h-[390px] min-h-0 overflow-hidden flex flex-col">
+       <div className="flex flex-col flex-1 min-h-0">
+  {/* Header */}
+          <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-[#292936] shrink-0">
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-semibold text-[#F3F3F7]">Today's Tasks</h3>
@@ -76,7 +76,9 @@ export const TasksAndPlansSection: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="flex-1 min-h-0 overflow-y-auto pr-2 space-y-2
+                [scrollbar-width:thin]
+                [scrollbar-color:#3B3B4E_transparent]">
               {todayTasks.map(task => {
                 const priorityBadge = getPriorityBadge(task.priority);
 
@@ -163,7 +165,7 @@ export const TasksAndPlansSection: React.FC = () => {
       </div>
 
       {/* RIGHT CARD — Upcoming Plans */}
-      <div className="bg-[#14141D] border border-[#292936] rounded-xl p-5 h-[560px] min-h-0 overflow-hidden flex flex-col">
+      <div className="bg-[#14141D] border border-[#292936] rounded-xl p-5 h-[390px] min-h-0 overflow-hidden flex flex-col">
         <div className="flex flex-col flex-1 min-h-0">
   {/* Header */}
           <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-[#292936] shrink-0">
